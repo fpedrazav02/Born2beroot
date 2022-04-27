@@ -37,4 +37,29 @@ lvms=$(lbslk | grep lvm | wc -l)
 lvme=$(if [ "$lvms" = 0 ]; then echo YES; else echo NO; fi)
 
 #Número de conexiones activas --> TCP
-ctcp=$(cat /proc/net/sockstat)
+#file --> /proc/net/sockstat ... coger las conexiones TCP
+ctcp=$(cat /proc/net/sockstat | awk '/TCP:{print $3}')
+
+#NUMERO DE USUARIOS CONECTADOS EN EL SERVER
+ulogged=$(users | wc -c)
+
+#IP y MACS
+dip=$(hostname -I)
+MAC=$(ip link show | awk '/link\/ether/{print $2}')
+
+#NUMERO DE COMANDOS SUDO EJECUTADOS
+sudocmd=$(journalctl _COMM=sudo | grep COMMAND | wc -l)
+
+wall "	#Arquitectura: $arc
+	#Nucleos físicos CPU: $ncpu
+	#Nucleos lógicos CPU: $vcpu
+	#RAM: $uram/$fram  ($pram%)
+	#MEMORIA DISCO: $udisk/$fdisk ($pdisk%)
+	#USO DE NUCLEOS: $cpul
+	#Último reinicio: $ureinicio
+	#Uso de LVM: $lvme
+	#Conexiones establecidas: $ctcp
+	#Usuarios conectados: $ulogged
+	#Network: IP $dip ($MAC)
+	#CMD SUDO: $sudocmd"
+#WaLl es lo que hace broadcast al resto de ususarios conectados
